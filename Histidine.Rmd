@@ -1,0 +1,1250 @@
+---
+title: "Histidine"
+author: "Michael Bennett"
+date: '2022-05-13'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(devtools)
+#install_github("uwbmrb/RBMRB/RBMRB")
+library(RBMRB)
+library(patchwork)
+```
+
+```{r data}
+cs <- fetch_entry_chemical_shifts(27502) # S. aureus /
+spect_data <- convert_cs_to_n15hsqc(cs)
+cs1 <- fetch_entry_chemical_shifts(27882) # C. crescentus /
+spect_data1 <- convert_cs_to_n15hsqc(cs1)
+cs2 <- fetch_entry_chemical_shifts(26840) # P. aeruginosa /
+spect_data2 <- convert_cs_to_n15hsqc(cs2)
+cs3 <- fetch_entry_chemical_shifts(25527) # Stress-related acidosis /
+spect_data3 <- convert_cs_to_n15hsqc(cs3)
+cs4 <- fetch_entry_chemical_shifts(25278) # B. pseudomallei /
+spect_data4 <- convert_cs_to_n15hsqc(cs4)
+cs5 <- fetch_entry_chemical_shifts(11557) # Pin1 Gene /
+spect_data5 <- convert_cs_to_n15hsqc(cs5)
+cs6 <- fetch_entry_chemical_shifts(11558) # Pin1 Gene /
+spect_data6 <- convert_cs_to_n15hsqc(cs6)
+cs7 <- fetch_entry_chemical_shifts(11527) # PriB /
+spect_data7 <- convert_cs_to_n15hsqc(cs7)
+cs8 <- fetch_entry_chemical_shifts(19245) # E. coli /
+spect_data8 <- convert_cs_to_n15hsqc(cs8)
+cs9 <- fetch_entry_chemical_shifts(19244) # E. coli /
+spect_data9 <- convert_cs_to_n15hsqc(cs9)
+cs10 <- fetch_entry_chemical_shifts(19243) # E. coli /
+spect_data10 <- convert_cs_to_n15hsqc(cs10)
+cs13 <- fetch_entry_chemical_shifts(16205) # E. coli /
+spect_data13 <- convert_cs_to_n15hsqc(cs13)
+cs14 <- fetch_entry_chemical_shifts(16204) # E.coli /  
+spect_data14 <- convert_cs_to_n15hsqc(cs14)
+cs15 <- fetch_entry_chemical_shifts(15787) # HINT1 protein /
+spect_data15 <- convert_cs_to_n15hsqc(cs15)
+cs16 <- fetch_entry_chemical_shifts(7370) # D. crassirhizoma /
+spect_data16 <- convert_cs_to_n15hsqc(cs16)
+cs17 <- fetch_entry_chemical_shifts(7132) # T. maritima /
+spect_data17 <- convert_cs_to_n15hsqc(cs17)
+cs18 <- fetch_entry_chemical_shifts(7133) # T. maritima /
+spect_data18 <- convert_cs_to_n15hsqc(cs18)
+cs19 <- fetch_entry_chemical_shifts(6254) # S. carnosus /
+spect_data19 <- convert_cs_to_n15hsqc(cs19)
+cs20 <- fetch_entry_chemical_shifts(6147) # LuxU protein /
+spect_data20 <- convert_cs_to_n15hsqc(cs20)
+cs21 <- fetch_entry_chemical_shifts(6133) # E. coli /
+spect_data21 <- convert_cs_to_n15hsqc(cs21)
+cs22 <- fetch_entry_chemical_shifts(5858) # Plastocyanin /
+spect_data22 <- convert_cs_to_n15hsqc(cs22)
+cs23 <- fetch_entry_chemical_shifts(5847) # B. subtilis /
+spect_data23 <- convert_cs_to_n15hsqc(cs23)
+```
+
+# S. aureus
+
+**Backbone 1H, 13C, and 15N Chemical Shift Assignments for Histidine Kinase NsaS from S. aureus**
+
+- Structure and Function of the Transmembrane Domain of NsaS, an Antibiotic Sensing Histidine Kinase in Staphylococcus aureus.
+
+```{r point}
+P <- spect_data %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH}
+medH <- paste0("Median: ", median(spect_data$H), ' ppm')
+histH <- spect_data %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .14, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .14), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH)
+```
+
+```{r histN}
+medN <- paste0("Median: ", median(spect_data$N), ' ppm')
+histN <- spect_data %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.38, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.38), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN)
+```
+
+```{r box}
+box <- spect_data %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots, fig.width=11,fig.height=8.5}
+P + box + histN + histH
+```
+
+# S. carnosus
+
+**1H, 13C, and 15N Chemical Shift Assignments for I14A mutant of histidine-containing phosphocarrier protein from Staphylococcus carnosus**
+
+- Solution structure of the active-centre mutant I14A of the histidine-containing phosphocarrier protein from Staphylococcus carnosus
+
+```{r point19}
+P19 <- spect_data19 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH19}
+medH19 <- paste0("Median: ", median(spect_data19$H), ' ppm')
+histH19 <- spect_data19 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = 2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data19$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH19)
+```
+
+```{r histN19}
+medN19 <- paste0("Median: ", median(spect_data19$N), ' ppm')
+histN19 <- spect_data19 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.6, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.6), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data19$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN19)
+```
+
+```{r box19}
+box19 <- spect_data19 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots19, fig.width=11,fig.height=8.5}
+P19 + box19 + histN19 + histH19
+```
+
+# E. coli
+
+**Backbone chemical shifts from E. coli HisJ complexed with Histidine**
+
+- Role of the Two Structural Domains from the Periplasmic Escherichia coli Histidine-binding Protein HisJ.
+
+```{r point8}
+P8 <- spect_data8 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH8}
+medH8 <- paste0("Median: ", median(spect_data8$H), ' ppm')
+histH8 <- spect_data8 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .28, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .28), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data8$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH8)
+```
+
+```{r histN8}
+medN8 <- paste0("Median: ", median(spect_data8$N), ' ppm')
+histN8 <- spect_data8 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 1.9, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 1.9), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data8$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN8)
+```
+
+```{r box8}
+box8 <- spect_data8 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots8, fig.width=11,fig.height=8.5}
+P8 + box8 + histN8 + histH8
+```
+
+**Backbone chemical shifts of isolated Domain 2 from E. coli HisJ**
+
+```{r point9}
+P9 <- spect_data9 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH9}
+medH9 <- paste0("Median: ", median(spect_data9$H), ' ppm')
+histH9 <- spect_data9 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .29, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .29), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data9$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH9)
+```
+
+```{r histN9}
+medN9 <- paste0("Median: ", median(spect_data9$N), ' ppm')
+histN9 <- spect_data9 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.8, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.8), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data9$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN9)
+```
+
+```{r box9}
+box9 <- spect_data9 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots9, fig.width=11,fig.height=8.5}
+P9 + box9 + histN9 + histH9
+```
+
+**Backbone chemical shifts of isolated Domain 1 from E. coli HisJ**
+
+```{r point10}
+P10 <- spect_data10 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH10}
+medH10 <- paste0("Median: ", median(spect_data10$H), ' ppm')
+histH10 <- spect_data10 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .3, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .3), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data10$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH10)
+```
+
+```{r histN10}
+medN10 <- paste0("Median: ", median(spect_data10$N), ' ppm')
+histN10 <- spect_data10 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data10$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN10)
+```
+
+```{r box10}
+box10 <- spect_data10 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots10, fig.width=11,fig.height=8.5}
+P10 + box10 + histN10 + histH10
+```
+
+**Backbone 1H, 13C, and 15N Chemical Shift Assignments for apo HisJ and holo HisJ**
+
+```{r point13}
+P13 <- spect_data13 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH13}
+medH13 <- paste0("Median: ", median(spect_data13$H), ' ppm')
+histH13 <- spect_data13 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .25, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .25), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data13$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH13)
+```
+
+```{r histN13}
+medN13 <- paste0("Median: ", median(spect_data13$N), ' ppm')
+histN13 <- spect_data13 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data13$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN13)
+```
+
+```{r box13}
+box13 <- spect_data13 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots13, fig.width=11,fig.height=8.5}
+P13 + box13 + histN13 + histH13
+```
+
+```{r point14}
+P14 <- spect_data14 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH14}
+medH14 <- paste0("Median: ", median(spect_data14$H), ' ppm')
+histH14 <- spect_data14 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .28, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .28), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data14$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH14)
+```
+
+```{r histN14}
+medN14 <- paste0("Median: ", median(spect_data14$N), ' ppm')
+histN14 <- spect_data14 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 1.9, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 1.9), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data14$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN14)
+```
+
+```{r box14}
+box14 <- spect_data14 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots14, fig.width=11,fig.height=8.5}
+P14 + box14 + histN14 + histH14
+```
+
+**1H, 13C, and 15N Chemical Shift Assignments for YojN-HPt**
+
+- Assignment of 1H, 13C and 15N resonances of the Escherichia coli YojN Histidine-Phosphotransferase (HPt) domain. 
+
+```{r point21}
+P21 <- spect_data21 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH21}
+medH21 <- paste0("Median: ", median(spect_data21$H), ' ppm')
+histH21 <- spect_data21 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .25, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .25), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data21$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH21)
+```
+
+```{r histN21}
+medN21 <- paste0("Median: ", median(spect_data21$N), ' ppm')
+histN21 <- spect_data21 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data21$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN21)
+```
+
+```{r box21}
+box21 <- spect_data21 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots21, fig.width=11,fig.height=8.5}
+P21 + box21 + histN21 + histH21
+```
+
+# C. crescentus
+
+**Backbone 1H, 13C, 15N chemical shift assignments for the ShkA kinase Rec2 domain from Caulobacter crescentus**
+
+- Hybrid Histidine kinase activation by cyclic-di-GMP induced domain liberation
+
+```{r point1}
+P1 <- spect_data1 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH1}
+medH1 <- paste0("Median: ", median(spect_data1$H), ' ppm')
+histH1 <- spect_data1 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .29, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .29), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data1$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH1)
+```
+
+```{r histN1}
+medN1 <- paste0("Median: ", median(spect_data1$N), ' ppm')
+histN1 <- spect_data1 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 3.1, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 3.1), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data1$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN1)
+```
+
+```{r box1}
+box1 <- spect_data1 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots1, fig.width=11,fig.height=8.5}
+P1 + box1 + histN1 + histH1
+```
+
+# P. aeruginosa
+
+**1H, 13C, and 15N Chemical Shift Assignments for the periplasmic domain of GacS histidine-kinase**
+
+- NMR assignments of the GacS histidine-kinase periplasmic detection domain from Pseudomonas aeruginosa PAO1
+
+```{r point2}
+P2 <- spect_data2 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH2}
+medH2 <- paste0("Median: ", median(spect_data2$H), ' ppm')
+histH2 <- spect_data2 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .34, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .34), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data2$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH2)
+```
+
+```{r histN2}
+medN2 <- paste0("Median: ", median(spect_data2$N), ' ppm')
+histN2 <- spect_data2 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 4.6, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 4.6), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data2$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN2)
+```
+
+```{r box2}
+box2 <- spect_data2 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots2, fig.width=11,fig.height=8.5}
+P2 + box2 + histN2 + histH2
+```
+
+# Stress-related acidosis
+
+**Chemical shift assignments and structure of the alpha-crystallin domain from human, HSPB5**
+
+- A conserved histidine modulates HSPB5 structure to trigger chaperone activity in response to stress-related acidosis
+
+```{r point3}
+P3 <- spect_data3 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH3}
+medH3 <- paste0("Median: ", median(spect_data3$H), ' ppm')
+histH3 <- spect_data3 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .37, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .37), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data3$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH3)
+```
+
+```{r histN3}
+medN3 <- paste0("Median: ", median(spect_data3$N), ' ppm')
+histN3 <- spect_data3 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.9, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.9), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data3$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN3)
+```
+
+```{r box3}
+box3 <- spect_data3 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots3, fig.width=11,fig.height=8.5}
+P3 + box3 + histN3 + histH3
+```
+
+# Pin1 Gene
+
+**Backbone 1H, 13C, and 15N Chemical Shift Assignments for the peptidyl prolyl cis-trans isomerase domain of human Pin1 without sulfate ion**
+
+- The C113D mutation in human Pin1 causes allosteric structural changes in the phosphate binding pocket of the PPIase domain through the tug of war in the dual-histidine motif.
+
+```{r point5}
+P5 <- spect_data5 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH5}
+medH5 <- paste0("Median: ", median(spect_data5$H), ' ppm')
+histH5 <- spect_data5 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .33, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .33), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data5$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH5)
+```
+
+```{r histN5}
+medN5 <- paste0("Median: ", median(spect_data5$N), ' ppm')
+histN5 <- spect_data5 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.7, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.7), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data5$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN5)
+```
+
+```{r box5}
+box5 <- spect_data5 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots5, fig.width=11,fig.height=8.5}
+P5 + box5 + histN5 + histH5
+```
+
+**Backbone 1H, 13C, and 15N Chemical Shift Assignments for the peptidyl prolyl cis-trans isomerase domain of C113D mutant human Pin1 without sulfate ion**
+
+```{r point6}
+P6 <- spect_data6 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH6}
+medH6 <- paste0("Median: ", median(spect_data6$H), ' ppm')
+histH6 <- spect_data6 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .33, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .33), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data6$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH6)
+```
+
+```{r histN6}
+medN6 <- paste0("Median: ", median(spect_data6$N), ' ppm')
+histN6 <- spect_data6 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.7, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.7), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data6$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN6)
+```
+
+```{r box6}
+box6 <- spect_data6 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots6, fig.width=11,fig.height=8.5}
+P6 + box6 + histN6 + histH6
+```
+
+# T. maritima
+
+**1H, 13C and 15N Chemical Shift Assignments for the CheA P1 domain from Thermotoga maritima**
+
+- Chemical-shift-perturbation mapping of the phosphotransfer and catalytic domain interaction in the histidine autokinase CheA from Thermotoga maritima.
+
+```{r point17}
+P17 <- spect_data17 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH17}
+medH17 <- paste0("Median: ", median(spect_data17$H), ' ppm')
+histH17 <- spect_data17 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .25, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .25), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data17$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH17)
+```
+
+```{r histN17}
+medN17 <- paste0("Median: ", median(spect_data17$N), ' ppm')
+histN17 <- spect_data17 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data17$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN17)
+```
+
+```{r box17}
+box17 <- spect_data17 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots17, fig.width=11,fig.height=8.5}
+P17 + box17 + histN17 + histH17
+```
+
+**Backbone 1H and 15N Chemical Shift Assignments for the CheA P4 domain from Thermotoga maritima, in the context of a P3P4 construct**
+
+```{r point18}
+P18 <- spect_data18 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH18}
+medH18 <- paste0("Median: ", median(spect_data18$H), ' ppm')
+histH18 <- spect_data18 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .25, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .25), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data18$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH18)
+```
+
+```{r histN18}
+medN18 <- paste0("Median: ", median(spect_data18$N), ' ppm')
+histN18 <- spect_data18 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 1.7, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 1.7), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data18$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN18)
+```
+
+```{r box18}
+box18 <- spect_data18 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots18, fig.width=11,fig.height=8.5}
+P18 + box18 + histN18 + histH18
+```
+
+# PriB
+
+**Backbone 1H, 13C, and 15N Chemical Shift Assignments for PriB**
+
+- Involvement of histidine in complex formation of PriB and single-stranded DNA
+
+```{r point7}
+P7 <- spect_data7 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH7}
+medH7 <- paste0("Median: ", median(spect_data7$H), ' ppm')
+histH7 <- spect_data7 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .38, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .38), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data7$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH7)
+```
+
+```{r histN7}
+medN7 <- paste0("Median: ", median(spect_data7$N), ' ppm')
+histN7 <- spect_data7 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.87, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.87), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data7$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN7)
+```
+
+```{r box7}
+box7 <- spect_data7 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots7, fig.width=11,fig.height=8.5}
+P7 + box7 + histN7 + histH7
+```
+
+# B. pseudomallei
+
+**Backbone chemical shift assignments for the sensor domain of the Burkholderia pseudomallei histidine kinase RisS. Seattle Structural Genomics Center for Infectious Disease target BupsA.00863.i.**
+
+- Backbone chemical shift assignments for the sensor domain of the Burkholderia pseudomallei histidine kinase RisS - An "invisible" dimer interface.
+
+```{r point4}
+P4 <- spect_data4 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH4}
+medH4 <- paste0("Median: ", median(spect_data4$H), ' ppm')
+histH4 <- spect_data4 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .4, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .4), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data4$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH4)
+```
+
+```{r histN4}
+medN4 <- paste0("Median: ", median(spect_data4$N), ' ppm')
+histN4 <- spect_data4 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 3.1, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 3.1), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data4$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN4)
+```
+
+```{r box4}
+box4 <- spect_data4 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots4, fig.width=11,fig.height=8.5}
+P4 + box4 + histN4 + histH4
+```
+
+# HINT1 protein
+
+**1H and 15N chemical shift assignments for HINT1 protein**
+
+- Backbone assignment of HINT1 protein, a mouse histidine triad nucleotide binding protein
+
+```{r point15}
+P15 <- spect_data15 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH15}
+medH15 <- paste0("Median: ", median(spect_data15$H), ' ppm')
+histH15 <- spect_data15 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .38, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .38), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data15$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH15)
+```
+
+```{r histN15}
+medN15 <- paste0("Median: ", median(spect_data15$N), ' ppm')
+histN15 <- spect_data15 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.7, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.7), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data15$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN15)
+```
+
+```{r box15}
+box15 <- spect_data15 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots15, fig.width=11,fig.height=8.5}
+P15 + box15 + histN15 + histH15
+```
+
+# D. crassirhizoma
+
+**Backbone 1H and 15N chemical shift assignments of D. crassirhizoma Plastocyanin**
+
+- Protonation of a histidine copper ligand in fern plastocyanin
+
+```{r point16}
+P16 <- spect_data16 %>%
+  ggplot() +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  geom_point(aes(H, N), color = 'darkblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH16}
+medH16 <- paste0("Median: ", median(spect_data16$H), ' ppm')
+histH16 <- spect_data16 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .44, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .44), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data16$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH16)
+```
+
+```{r histN16}
+medN16 <- paste0("Median: ", median(spect_data16$N), ' ppm')
+histN16 <- spect_data16 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.5, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.5), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data16$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN16)
+```
+
+```{r box16}
+box16 <- spect_data16 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots16, fig.width=11,fig.height=8.5}
+P16 + box16 + histN16 + histH16
+```
+
+# Plastocyanin
+
+**Characterization of us-ms Dynamics of Proteins Using a Combined Analysis of 15N NMR Relaxation and Chemical Shift: Conformational Exchange in Plastocyanin Induced by Histidine Protonations**
+
+```{r point22}
+P22 <- spect_data22 %>%
+  ggplot() +
+  geom_point(aes(H, N), color = 'darkblue') +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH22}
+medH22 <- paste0("Median: ", median(spect_data22$H), ' ppm')
+histH22 <- spect_data22 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .09, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .09), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data22$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH22)
+```
+
+```{r histN22}
+medN22 <- paste0("Median: ", median(spect_data22$N), ' ppm')
+histN22 <- spect_data22 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = .77, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .77), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data22$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN22)
+```
+
+```{r box22}
+box22 <- spect_data22 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots22, fig.width=11,fig.height=8.5}
+P22 + box22 + histN22 + histH22
+```
+
+# LuxU protein
+
+**1H, 15N, and 13C chemical shift assignments of the Vibrio Harveyi histidine phosphotransferase protein LuxU**
+
+```{r point20}
+P20 <- spect_data20 %>%
+  ggplot() +
+  geom_point(aes(H, N), color = 'darkblue') +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH20}
+medH20 <- paste0("Median: ", median(spect_data20$H), ' ppm')
+histH20 <- spect_data20 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .31, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .31), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data20$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH20)
+```
+
+```{r histN20}
+medN20 <- paste0("Median: ", median(spect_data20$N), ' ppm')
+histN20 <- spect_data20 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data20$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN20)
+```
+
+```{r box20}
+box20 <- spect_data20 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots20, fig.width=11,fig.height=8.5}
+P20 + box20 + histN20 + histH20
+```
+
+# B. subtilis
+
+**Backbone and sidechain 1H, 13C, and 15N chemical shifts for Sda**
+
+- Structure and mechanism of action of Sda, an inhibitor of the histidine kinases that regulate initiation of sporulation in Bacillus subtilis
+
+```{r point23}
+P23 <- spect_data23 %>%
+  ggplot() +
+  geom_point(aes(H, N), color = 'darkblue') +
+  geom_smooth(aes(H, N), method = 'gam', color = 'red') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r histH23}
+medH23 <- paste0("Median: ", median(spect_data23$H), ' ppm')
+histH23 <- spect_data23 %>% 
+  ggplot(aes(H, fill = cut(H, 100))) + 
+  geom_histogram(binwidth = .31, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * .31), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data23$H), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Hydrogen [ppm]', subtitle = medH23)
+```
+
+```{r histN23}
+medN23 <- paste0("Median: ", median(spect_data23$N), ' ppm')
+histN23 <- spect_data23 %>% 
+  ggplot(aes(N, fill = cut(N, 100))) + 
+  geom_histogram(binwidth = 2.6, colour = "goldenrod2", fill = "darkblue") +
+  geom_density(aes(y = ..count.. * 2.6), fill = "blue", alpha = .3, 
+               col = "gold") +
+  geom_vline(xintercept = median(spect_data23$N), linetype = 'dashed', 
+             col = 'white') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.title.y = element_blank()) +
+  labs(x = 'Nitrogen [ppm]', subtitle = medN23)
+```
+
+```{r box23}
+box23 <- spect_data23 %>%
+  ggplot() +
+  geom_boxplot(aes(H, N, group = 1), fill = 'lightblue') +
+  theme_bw() +
+  labs(x = 'Hydrogen [ppm]', y = 'Nitrogen [ppm]')
+```
+
+```{r plots23, fig.width=11,fig.height=8.5}
+P23 + box23 + histN23 + histH23
+```
+
+
+
+
+
+
+
+
